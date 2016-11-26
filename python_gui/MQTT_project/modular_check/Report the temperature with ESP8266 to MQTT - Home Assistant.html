@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<!-- saved from url=(0094)https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/ -->
+<html><!--<![endif]--><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>Report the temperature with ESP8266 to MQTT - Home Assistant</title>
+<meta name="author" content="Paulus Schoutsen">
+<meta name="description" content="Step by step tutorial to use ESP8266 and a HDC1008 to .">
+<meta name="viewport" content="width=device-width">
+<link rel="canonical" href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/">
+<meta property="fb:app_id" content="338291289691179">
+<meta property="og:title" content="Report the temperature with ESP8266 to MQTT">
+<meta property="og:site_name" content="Home Assistant">
+<meta property="og:url" content="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/">
+<meta property="og:type" content="article">
+<meta property="og:description" content="Step by step tutorial to use ESP8266 and a HDC1008 to .">
+<meta property="og:image" content="https://home-assistant.io/images/blog/2015-10-esp8266-temp/ha-sensor.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@home_assistant">
+<meta name="twitter:creator" content="@balloob">
+<meta name="twitter:title" content="Report the temperature with ESP8266 to MQTT">
+<meta name="twitter:description" content="Step by step tutorial to use ESP8266 and a HDC1008 to .">
+<meta name="twitter:image" content="https://home-assistant.io/images/blog/2015-10-esp8266-temp/ha-sensor.png">
+<link href="./Report the temperature with ESP8266 to MQTT - Home Assistant_files/screen.css" media="screen, projection" rel="stylesheet">
+<link href="https://home-assistant.io/atom.xml" rel="alternate" title="Home Assistant" type="application/atom+xml">
+<link rel="shortcut icon" href="https://home-assistant.io/images/favicon.ico">
+<link rel="icon" type="image/png" href="https://home-assistant.io/images/favicon-192x192.png" sizes="192x192">
+<style type="text/css"></style><script type="text/javascript" async="" src="./Report the temperature with ESP8266 to MQTT - Home Assistant_files/embed.js"></script><script type="text/javascript" charset="utf-8" async="" src="./Report the temperature with ESP8266 to MQTT - Home Assistant_files/button.177407e7c9fd9de66268350cb0968e03.js"></script><style type="text/css">.fb_hidden{position:absolute;top:-10000px;z-index:10001}.fb_reposition{overflow:hidden;position:relative}.fb_invisible{display:none}.fb_reset{background:none;border:0;border-spacing:0;color:#000;cursor:auto;direction:ltr;font-family:"lucida grande", tahoma, verdana, arial, sans-serif;font-size:11px;font-style:normal;font-variant:normal;font-weight:normal;letter-spacing:normal;line-height:1;margin:0;overflow:visible;padding:0;text-align:left;text-decoration:none;text-indent:0;text-shadow:none;text-transform:none;visibility:visible;white-space:normal;word-spacing:normal}.fb_reset>div{overflow:hidden}.fb_link img{border:none}@keyframes fb_transform{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}.fb_animate{animation:fb_transform .3s forwards}
+.fb_dialog{background:rgba(82, 82, 82, .7);position:absolute;top:-10000px;z-index:10001}.fb_reset .fb_dialog_legacy{overflow:visible}.fb_dialog_advanced{padding:10px;-moz-border-radius:8px;-webkit-border-radius:8px;border-radius:8px}.fb_dialog_content{background:#fff;color:#333}.fb_dialog_close_icon{background:url(https://fbstatic-a.akamaihd.net/rsrc.php/v2/yq/r/IE9JII6Z1Ys.png) no-repeat scroll 0 0 transparent;_background-image:url(https://fbstatic-a.akamaihd.net/rsrc.php/v2/yL/r/s816eWC-2sl.gif);cursor:pointer;display:block;height:15px;position:absolute;right:18px;top:17px;width:15px}.fb_dialog_mobile .fb_dialog_close_icon{top:5px;left:5px;right:auto}.fb_dialog_padding{background-color:transparent;position:absolute;width:1px;z-index:-1}.fb_dialog_close_icon:hover{background:url(https://fbstatic-a.akamaihd.net/rsrc.php/v2/yq/r/IE9JII6Z1Ys.png) no-repeat scroll 0 -15px transparent;_background-image:url(https://fbstatic-a.akamaihd.net/rsrc.php/v2/yL/r/s816eWC-2sl.gif)}.fb_dialog_close_icon:active{background:url(https://fbstatic-a.akamaihd.net/rsrc.php/v2/yq/r/IE9JII6Z1Ys.png) no-repeat scroll 0 -30px transparent;_background-image:url(https://fbstatic-a.akamaihd.net/rsrc.php/v2/yL/r/s816eWC-2sl.gif)}.fb_dialog_loader{background-color:#f6f7f9;border:1px solid #606060;font-size:24px;padding:20px}.fb_dialog_top_left,.fb_dialog_top_right,.fb_dialog_bottom_left,.fb_dialog_bottom_right{height:10px;width:10px;overflow:hidden;position:absolute}.fb_dialog_top_left{background:url(https://fbstatic-a.akamaihd.net/rsrc.php/v2/ye/r/8YeTNIlTZjm.png) no-repeat 0 0;left:-10px;top:-10px}.fb_dialog_top_right{background:url(https://fbstatic-a.akamaihd.net/rsrc.php/v2/ye/r/8YeTNIlTZjm.png) no-repeat 0 -10px;right:-10px;top:-10px}.fb_dialog_bottom_left{background:url(https://fbstatic-a.akamaihd.net/rsrc.php/v2/ye/r/8YeTNIlTZjm.png) no-repeat 0 -20px;bottom:-10px;left:-10px}.fb_dialog_bottom_right{background:url(https://fbstatic-a.akamaihd.net/rsrc.php/v2/ye/r/8YeTNIlTZjm.png) no-repeat 0 -30px;right:-10px;bottom:-10px}.fb_dialog_vert_left,.fb_dialog_vert_right,.fb_dialog_horiz_top,.fb_dialog_horiz_bottom{position:absolute;background:#525252;filter:alpha(opacity=70);opacity:.7}.fb_dialog_vert_left,.fb_dialog_vert_right{width:10px;height:100%}.fb_dialog_vert_left{margin-left:-10px}.fb_dialog_vert_right{right:0;margin-right:-10px}.fb_dialog_horiz_top,.fb_dialog_horiz_bottom{width:100%;height:10px}.fb_dialog_horiz_top{margin-top:-10px}.fb_dialog_horiz_bottom{bottom:0;margin-bottom:-10px}.fb_dialog_iframe{line-height:0}.fb_dialog_content .dialog_title{background:#6d84b4;border:1px solid #365899;color:#fff;font-size:14px;font-weight:bold;margin:0}.fb_dialog_content .dialog_title>span{background:url(https://fbstatic-a.akamaihd.net/rsrc.php/v2/yd/r/Cou7n-nqK52.gif) no-repeat 5px 50%;float:left;padding:5px 0 7px 26px}body.fb_hidden{-webkit-transform:none;height:100%;margin:0;overflow:visible;position:absolute;top:-10000px;left:0;width:100%}.fb_dialog.fb_dialog_mobile.loading{background:url(https://fbstatic-a.akamaihd.net/rsrc.php/v2/ya/r/3rhSv5V8j3o.gif) white no-repeat 50% 50%;min-height:100%;min-width:100%;overflow:hidden;position:absolute;top:0;z-index:10001}.fb_dialog.fb_dialog_mobile.loading.centered{width:auto;height:auto;min-height:initial;min-width:initial;background:none}.fb_dialog.fb_dialog_mobile.loading.centered #fb_dialog_loader_spinner{width:100%}.fb_dialog.fb_dialog_mobile.loading.centered .fb_dialog_content{background:none}.loading.centered #fb_dialog_loader_close{color:#fff;display:block;padding-top:20px;clear:both;font-size:18px}#fb-root #fb_dialog_ipad_overlay{background:rgba(0, 0, 0, .45);position:absolute;bottom:0;left:0;right:0;top:0;width:100%;min-height:100%;z-index:10000}#fb-root #fb_dialog_ipad_overlay.hidden{display:none}.fb_dialog.fb_dialog_mobile.loading iframe{visibility:hidden}.fb_dialog_content .dialog_header{-webkit-box-shadow:white 0 1px 1px -1px inset;background:-webkit-gradient(linear, 0% 0%, 0% 100%, from(#738ABA), to(#2C4987));border-bottom:1px solid;border-color:#1d4088;color:#fff;font:14px Helvetica, sans-serif;font-weight:bold;text-overflow:ellipsis;text-shadow:rgba(0, 30, 84, .296875) 0 -1px 0;vertical-align:middle;white-space:nowrap}.fb_dialog_content .dialog_header table{-webkit-font-smoothing:subpixel-antialiased;height:43px;width:100%}.fb_dialog_content .dialog_header td.header_left{font-size:12px;padding-left:5px;vertical-align:middle;width:60px}.fb_dialog_content .dialog_header td.header_right{font-size:12px;padding-right:5px;vertical-align:middle;width:60px}.fb_dialog_content .touchable_button{background:-webkit-gradient(linear, 0% 0%, 0% 100%, from(#4966A6), color-stop(.5, #355492), to(#2A4887));border:1px solid #29487d;-webkit-background-clip:padding-box;-webkit-border-radius:3px;-webkit-box-shadow:rgba(0, 0, 0, .117188) 0 1px 1px inset, rgba(255, 255, 255, .167969) 0 1px 0;display:inline-block;margin-top:3px;max-width:85px;line-height:18px;padding:4px 12px;position:relative}.fb_dialog_content .dialog_header .touchable_button input{border:none;background:none;color:#fff;font:12px Helvetica, sans-serif;font-weight:bold;margin:2px -12px;padding:2px 6px 3px 6px;text-shadow:rgba(0, 30, 84, .296875) 0 -1px 0}.fb_dialog_content .dialog_header .header_center{color:#fff;font-size:16px;font-weight:bold;line-height:18px;text-align:center;vertical-align:middle}.fb_dialog_content .dialog_content{background:url(https://fbstatic-a.akamaihd.net/rsrc.php/v2/y9/r/jKEcVPZFk-2.gif) no-repeat 50% 50%;border:1px solid #555;border-bottom:0;border-top:0;height:150px}.fb_dialog_content .dialog_footer{background:#f6f7f9;border:1px solid #555;border-top-color:#ccc;height:40px}#fb_dialog_loader_close{float:left}.fb_dialog.fb_dialog_mobile .fb_dialog_close_button{text-shadow:rgba(0, 30, 84, .296875) 0 -1px 0}.fb_dialog.fb_dialog_mobile .fb_dialog_close_icon{visibility:hidden}#fb_dialog_loader_spinner{animation:rotateSpinner 1.2s linear infinite;background-color:transparent;background-image:url(https://fbstatic-a.akamaihd.net/rsrc.php/v2/yD/r/t-wz8gw1xG1.png);background-repeat:no-repeat;background-position:50% 50%;height:24px;width:24px}@keyframes rotateSpinner{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+.fb_iframe_widget{display:inline-block;position:relative}.fb_iframe_widget span{display:inline-block;position:relative;text-align:justify}.fb_iframe_widget iframe{position:absolute}.fb_iframe_widget_fluid_desktop,.fb_iframe_widget_fluid_desktop span,.fb_iframe_widget_fluid_desktop iframe{max-width:100%}.fb_iframe_widget_fluid_desktop iframe{min-width:220px;position:relative}.fb_iframe_widget_lift{z-index:1}.fb_hide_iframes iframe{position:relative;left:-10000px}.fb_iframe_widget_loader{position:relative;display:inline-block}.fb_iframe_widget_fluid{display:inline}.fb_iframe_widget_fluid span{width:100%}.fb_iframe_widget_loader iframe{min-height:32px;z-index:2;zoom:1}.fb_iframe_widget_loader .FB_Loader{background:url(https://fbstatic-a.akamaihd.net/rsrc.php/v2/y9/r/jKEcVPZFk-2.gif) no-repeat;height:32px;width:32px;margin-left:-16px;position:absolute;left:50%;z-index:4}</style><script src="./Report the temperature with ESP8266 to MQTT - Home Assistant_files/alfie.f51946af45e0b561c60f768335c9eb79.js" async="" charset="UTF-8"></script></head>
+<body>
+<header>
+<div class="grid-wrapper">
+<div class="grid">
+<div class="grid__item three-tenths lap-two-sixths palm-one-whole ha-title">
+<a href="https://home-assistant.io/" class="site-title">
+<img width="40" src="./Report the temperature with ESP8266 to MQTT - Home Assistant_files/favicon-192x192.png">
+<span>Home Assistant</span>
+</a>
+</div>
+<div class="grid__item seven-tenths lap-four-sixths palm-one-whole">
+<nav>
+<input type="checkbox" id="toggle">
+<label for="toggle" class="toggle" data-open="Main Menu" data-close="Close Menu"></label>
+<ul class="menu pull-right">
+<li><a href="https://home-assistant.io/getting-started/">Getting started</a></li>
+<li><a href="https://home-assistant.io/components/">Components</a></li>
+<li><a href="https://home-assistant.io/cookbook/">Examples</a></li>
+<li><a href="https://home-assistant.io/developers/">Developers</a></li>
+<li><a href="https://home-assistant.io/blog/">Blog</a></li>
+<li><a href="https://home-assistant.io/help/">Need help?</a></li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+</header>
+<div class="grid-wrapper">
+<div class="grid grid-center">
+<div class="grid__item two-thirds lap-one-whole palm-one-whole">
+<article class="post">
+<header>
+<h1 class="title indent">Report the temperature with ESP8266 to MQTT</h1>
+<div class="meta clearfix">
+<time datetime="2015-10-11T19:10:00+00:00" pubdate="" data-updated="true"><i class="icon-calendar"></i> October 11, 2015</time>
+<span class="byline author vcard"><i class="icon-user"></i> Paulus Schoutsen</span>
+<span><i class="icon-time"></i> seven minutes reading time</span>
+<span>
+<i class="icon-tags"></i>
+<ul class="tags unstyled">
+<li><a class="category" href="https://home-assistant.io/blog/categories/esp8266/">ESP8266</a></li>
+<li><a class="category" href="https://home-assistant.io/blog/categories/how-to/">How-To</a></li>
+<li><a class="category" href="https://home-assistant.io/blog/categories/mqtt/">MQTT</a></li>
+</ul>
+</span>
+<a class="comments" href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#disqus_thread">Comments</a>
+</div>
+</header>
+<p>I recently learned about the ESP8266, a $5 chip that includes WiFi and is Arduino compatible. This means that all your DIY projects can now be done for a fraction of the price.</p>
+<p>For this tutorial, I’ll walk through how to get going with ESP8266, get the temperature and humidity and report it to MQTT where Home Asssistant can pick it up.</p>
+<p class="img">
+<img src="./Report the temperature with ESP8266 to MQTT - Home Assistant_files/setup.png">
+Picture of the final setup (+ 2 LED for decoration)
+</p>
+<p class="img">
+<img src="./Report the temperature with ESP8266 to MQTT - Home Assistant_files/ha-sensor.png">
+Home Assistant will keep track of historical values and allow you to integrate it into automation.
+</p>
+<a name="read-more"></a>
+<h3>Components</h3>
+<p>I’ve been using Adafruit for my shopping:</p>
+<ul>
+<li><a href="http://www.adafruit.com/product/2471">Adafruit HUZZAH ESP8266 Breakout</a> (<a href="https://learn.adafruit.com/adafruit-huzzah-esp8266-breakout/assembly">assembly instructions</a>)</li>
+<li><a href="http://www.adafruit.com/product/2635">Adafruit HDC1008 Temperature &amp; Humidity Sensor Breakout Board</a> (<a href="https://learn.adafruit.com/adafruit-hdc1008-temperature-and-humidity-sensor-breakout/assembly">assembly instructions</a>)</li>
+<li><a href="https://home-assistant.io/components/mqtt/#picking-a-broker">MQTT server</a></li>
+</ul>
+<p><em>Besides this, you will need the usual hardware prototype equipment: a breadboard, some wires, soldering iron + wire, Serial USB cable.</em></p>
+<h3>Connections</h3>
+<p>On your breadboard, make the following connections from your ESP8266 to the HDC1008:</p>
+<table>
+<thead>
+<tr>
+<th>ESP8266</th>
+<th>HDC1008</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GND</td>
+<td>GND</td>
+</tr>
+<tr>
+<td>3V</td>
+<td>Vin</td>
+</tr>
+<tr>
+<td>14</td>
+<td>SCL</td>
+</tr>
+<tr>
+<td>#2</td>
+<td>SDA</td>
+</tr>
+</tbody>
+</table>
+<p><em>I picked <code>#2</code> and <code>14</code> myself, you can configure them in the sketch.</em></p>
+<h3>Preparing your IDE</h3>
+<p>Follow <a href="https://github.com/esp8266/Arduino#installing-with-boards-manager">these instructions</a> on how to install and prepare the Arduino IDE for ESP8266 development.</p>
+<p>After you’re done installing, open the Arduino IDE, in the menu click on <code>sketch</code> -&gt; <code>include library</code> -&gt; <code>manage libraries</code> and install the following libraries:</p>
+<ul>
+<li>PubSubClient by Nick ‘O Leary</li>
+<li>Adafruit HDC1000</li>
+</ul>
+<h3>Sketch</h3>
+<p>If you have followed the previous steps, you’re all set.</p>
+<ul>
+<li>Open Arduino IDE and create a new sketch (<code>File</code> -&gt; <code>New</code>)</li>
+<li>Copy and paste the below sketch to the Arduino IDE</li>
+<li>Adjust the values line 6 - 14 to match your setup</li>
+<li>Optional: If you want to connect to an MQTT server without a username or password, adjust line 63.</li>
+<li>To have the ESP8266 accept our new sketch, we have to put it in upload mode. On the ESP8266 device keep the GPIO0 button pressed while pressing the reset button. The red led will glow half bright to indicate it is in upload mode.</li>
+<li>Press the upload button in Arduino IDE</li>
+<li>Open the serial monitor (<code>Tools</code> -&gt; <code>Serial Monitor</code>) to see the output from your device</li>
+</ul>
+<p>This sketch will connect to your WiFi network and MQTT broker. It will read the temperature and humidity from the sensor every second. It will report it to the MQTT server if the difference is &gt; 1 since last reported value. Reports to the MQTT broker are sent with retain set to <code>True</code>. This means that anyone connecting to the MQTT topic will automatically be notified of the last reported value.</p>
+<div class="highlighter-coderay"><table class="CodeRay"><tbody><tr>
+<td class="line-numbers"><pre><a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n1" name="n1">1</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n2" name="n2">2</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n3" name="n3">3</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n4" name="n4">4</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n5" name="n5">5</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n6" name="n6">6</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n7" name="n7">7</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n8" name="n8">8</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n9" name="n9">9</a>
+<strong><a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n10" name="n10">10</a></strong>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n11" name="n11">11</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n12" name="n12">12</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n13" name="n13">13</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n14" name="n14">14</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n15" name="n15">15</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n16" name="n16">16</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n17" name="n17">17</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n18" name="n18">18</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n19" name="n19">19</a>
+<strong><a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n20" name="n20">20</a></strong>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n21" name="n21">21</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n22" name="n22">22</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n23" name="n23">23</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n24" name="n24">24</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n25" name="n25">25</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n26" name="n26">26</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n27" name="n27">27</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n28" name="n28">28</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n29" name="n29">29</a>
+<strong><a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n30" name="n30">30</a></strong>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n31" name="n31">31</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n32" name="n32">32</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n33" name="n33">33</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n34" name="n34">34</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n35" name="n35">35</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n36" name="n36">36</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n37" name="n37">37</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n38" name="n38">38</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n39" name="n39">39</a>
+<strong><a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n40" name="n40">40</a></strong>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n41" name="n41">41</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n42" name="n42">42</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n43" name="n43">43</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n44" name="n44">44</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n45" name="n45">45</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n46" name="n46">46</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n47" name="n47">47</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n48" name="n48">48</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n49" name="n49">49</a>
+<strong><a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n50" name="n50">50</a></strong>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n51" name="n51">51</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n52" name="n52">52</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n53" name="n53">53</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n54" name="n54">54</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n55" name="n55">55</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n56" name="n56">56</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n57" name="n57">57</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n58" name="n58">58</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n59" name="n59">59</a>
+<strong><a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n60" name="n60">60</a></strong>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n61" name="n61">61</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n62" name="n62">62</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n63" name="n63">63</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n64" name="n64">64</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n65" name="n65">65</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n66" name="n66">66</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n67" name="n67">67</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n68" name="n68">68</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n69" name="n69">69</a>
+<strong><a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n70" name="n70">70</a></strong>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n71" name="n71">71</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n72" name="n72">72</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n73" name="n73">73</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n74" name="n74">74</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n75" name="n75">75</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n76" name="n76">76</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n77" name="n77">77</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n78" name="n78">78</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n79" name="n79">79</a>
+<strong><a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n80" name="n80">80</a></strong>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n81" name="n81">81</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n82" name="n82">82</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n83" name="n83">83</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n84" name="n84">84</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n85" name="n85">85</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n86" name="n86">86</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n87" name="n87">87</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n88" name="n88">88</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n89" name="n89">89</a>
+<strong><a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n90" name="n90">90</a></strong>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n91" name="n91">91</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n92" name="n92">92</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n93" name="n93">93</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n94" name="n94">94</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n95" name="n95">95</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n96" name="n96">96</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n97" name="n97">97</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n98" name="n98">98</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n99" name="n99">99</a>
+<strong><a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n100" name="n100">100</a></strong>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n101" name="n101">101</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n102" name="n102">102</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n103" name="n103">103</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n104" name="n104">104</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n105" name="n105">105</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n106" name="n106">106</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n107" name="n107">107</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n108" name="n108">108</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n109" name="n109">109</a>
+</pre></td>
+<td class="code"><pre><span class="preprocessor">#include</span> <span class="include">&lt;ESP8266WiFi.h&gt;</span>
+<span class="preprocessor">#include</span> <span class="include">&lt;Wire.h&gt;</span>
+<span class="preprocessor">#include</span> <span class="include">&lt;PubSubClient.h&gt;</span>
+<span class="preprocessor">#include</span> <span class="include">&lt;Adafruit_HDC1000.h&gt;</span>
+
+<span class="preprocessor">#define</span> wifi_ssid <span class="string"><span class="delimiter">"</span><span class="content">YOUR WIFI SSID</span><span class="delimiter">"</span></span>
+<span class="preprocessor">#define</span> wifi_password <span class="string"><span class="delimiter">"</span><span class="content">WIFI PASSWORD</span><span class="delimiter">"</span></span>
+
+<span class="preprocessor">#define</span> mqtt_server <span class="string"><span class="delimiter">"</span><span class="content">YOUR_MQTT_SERVER_HOST</span><span class="delimiter">"</span></span>
+<span class="preprocessor">#define</span> mqtt_user <span class="string"><span class="delimiter">"</span><span class="content">your_username</span><span class="delimiter">"</span></span>
+<span class="preprocessor">#define</span> mqtt_password <span class="string"><span class="delimiter">"</span><span class="content">your_password</span><span class="delimiter">"</span></span>
+
+<span class="preprocessor">#define</span> humidity_topic <span class="string"><span class="delimiter">"</span><span class="content">sensor/humidity</span><span class="delimiter">"</span></span>
+<span class="preprocessor">#define</span> temperature_topic <span class="string"><span class="delimiter">"</span><span class="content">sensor/temperature</span><span class="delimiter">"</span></span>
+
+WiFiClient espClient;
+PubSubClient client(espClient);
+Adafruit_HDC1000 hdc = Adafruit_HDC1000();
+
+<span class="directive">void</span> setup() {
+  Serial.begin(<span class="integer">115200</span>);
+  setup_wifi();
+  client.setServer(mqtt_server, <span class="integer">1883</span>);
+
+  <span class="comment">// Set SDA and SDL ports</span>
+  Wire.begin(<span class="integer">2</span>, <span class="integer">14</span>);
+
+  <span class="comment">// Start sensor</span>
+  <span class="keyword">if</span> (!hdc.begin()) {
+    Serial.println(<span class="string"><span class="delimiter">"</span><span class="content">Couldn't find sensor!</span><span class="delimiter">"</span></span>);
+    <span class="keyword">while</span> (<span class="integer">1</span>);
+  }}
+
+<span class="directive">void</span> setup_wifi() {
+  delay(<span class="integer">10</span>);
+  <span class="comment">// We start by connecting to a WiFi network</span>
+  Serial.println();
+  Serial.print(<span class="string"><span class="delimiter">"</span><span class="content">Connecting to </span><span class="delimiter">"</span></span>);
+  Serial.println(wifi_ssid);
+
+  WiFi.begin(wifi_ssid, wifi_password);
+
+  <span class="keyword">while</span> (WiFi.status() != WL_CONNECTED) {
+    delay(<span class="integer">500</span>);
+    Serial.print(<span class="string"><span class="delimiter">"</span><span class="content">.</span><span class="delimiter">"</span></span>);
+  }
+
+  Serial.println(<span class="string"><span class="delimiter">"</span><span class="delimiter">"</span></span>);
+  Serial.println(<span class="string"><span class="delimiter">"</span><span class="content">WiFi connected</span><span class="delimiter">"</span></span>);
+  Serial.println(<span class="string"><span class="delimiter">"</span><span class="content">IP address: </span><span class="delimiter">"</span></span>);
+  Serial.println(WiFi.localIP());
+}
+
+<span class="directive">void</span> reconnect() {
+  <span class="comment">// Loop until we're reconnected</span>
+  <span class="keyword">while</span> (!client.connected()) {
+    Serial.print(<span class="string"><span class="delimiter">"</span><span class="content">Attempting MQTT connection...</span><span class="delimiter">"</span></span>);
+    <span class="comment">// Attempt to connect</span>
+    <span class="comment">// If you do not want to use a username and password, change next line to</span>
+    <span class="comment">// if (client.connect("ESP8266Client")) {</span>
+    <span class="keyword">if</span> (client.connect(<span class="string"><span class="delimiter">"</span><span class="content">ESP8266Client</span><span class="delimiter">"</span></span>, mqtt_user, mqtt_password)) {
+      Serial.println(<span class="string"><span class="delimiter">"</span><span class="content">connected</span><span class="delimiter">"</span></span>);
+    } <span class="keyword">else</span> {
+      Serial.print(<span class="string"><span class="delimiter">"</span><span class="content">failed, rc=</span><span class="delimiter">"</span></span>);
+      Serial.print(client.state());
+      Serial.println(<span class="string"><span class="delimiter">"</span><span class="content"> try again in 5 seconds</span><span class="delimiter">"</span></span>);
+      <span class="comment">// Wait 5 seconds before retrying</span>
+      delay(<span class="integer">5000</span>);
+    }
+  }
+}
+
+<span class="predefined-type">bool</span> checkBound(<span class="predefined-type">float</span> newValue, <span class="predefined-type">float</span> prevValue, <span class="predefined-type">float</span> maxDiff) {
+  <span class="keyword">return</span> newValue &lt; prevValue - maxDiff || newValue &gt; prevValue + maxDiff;
+}
+
+<span class="predefined-type">long</span> lastMsg = <span class="integer">0</span>;
+<span class="predefined-type">float</span> temp = <span class="float">0</span><span class="float">.0</span>;
+<span class="predefined-type">float</span> hum = <span class="float">0</span><span class="float">.0</span>;
+<span class="predefined-type">float</span> diff = <span class="float">1</span><span class="float">.0</span>;
+
+<span class="directive">void</span> loop() {
+  <span class="keyword">if</span> (!client.connected()) {
+    reconnect();
+  }
+  client.loop();
+
+  <span class="predefined-type">long</span> now = millis();
+  <span class="keyword">if</span> (now - lastMsg &gt; <span class="integer">1000</span>) {
+    lastMsg = now;
+
+    <span class="predefined-type">float</span> newTemp = hdc.readTemperature();
+    <span class="predefined-type">float</span> newHum = hdc.readHumidity();
+
+    <span class="keyword">if</span> (checkBound(newTemp, temp, diff)) {
+      temp = newTemp;
+      Serial.print(<span class="string"><span class="delimiter">"</span><span class="content">New temperature:</span><span class="delimiter">"</span></span>);
+      Serial.println(String(temp).c_str());
+      client.publish(temperature_topic, String(temp).c_str(), <span class="predefined-constant">true</span>);
+    }
+
+    <span class="keyword">if</span> (checkBound(newHum, hum, diff)) {
+      hum = newHum;
+      Serial.print(<span class="string"><span class="delimiter">"</span><span class="content">New humidity:</span><span class="delimiter">"</span></span>);
+      Serial.println(String(hum).c_str());
+      client.publish(humidity_topic, String(hum).c_str(), <span class="predefined-constant">true</span>);
+    }
+  }
+}
+</pre></td>
+</tr></tbody></table>
+</div>
+<h3>Configuring Home Assistant</h3>
+<p>The last step is to integrate the sensor values into Home Assistant. This can be done by setting up Home Assistant to connect to the MQTT broker and subscribe to the sensor topics.</p>
+<div class="highlighter-coderay"><table class="CodeRay"><tbody><tr>
+<td class="line-numbers"><pre><a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n1" name="n1">1</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n2" name="n2">2</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n3" name="n3">3</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n4" name="n4">4</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n5" name="n5">5</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n6" name="n6">6</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n7" name="n7">7</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n8" name="n8">8</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n9" name="n9">9</a>
+<strong><a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n10" name="n10">10</a></strong>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n11" name="n11">11</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n12" name="n12">12</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n13" name="n13">13</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n14" name="n14">14</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n15" name="n15">15</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n16" name="n16">16</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n17" name="n17">17</a>
+<a href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/#n18" name="n18">18</a>
+</pre></td>
+<td class="code"><pre><span class="key">mqtt</span>:
+  <span class="key">broker</span>: <span class="string"><span class="content">YOUR_MQTT_SERVER_HOST</span></span>
+  <span class="key">username</span>: <span class="string"><span class="content">your_username</span></span>
+  <span class="key">password</span>: <span class="string"><span class="content">your_password</span></span>
+
+<span class="key">sensor</span>:
+  <span class="key">platform</span>: <span class="string"><span class="content">mqtt</span></span>
+  <span class="key">name</span>: <span class="string"><span class="delimiter">"</span><span class="content">Temperature</span><span class="delimiter">"</span></span>
+  <span class="key">state_topic</span>: <span class="string"><span class="delimiter">"</span><span class="content">sensor/temperature</span><span class="delimiter">"</span></span>
+  <span class="key">qos</span>: <span class="string"><span class="content">0</span></span>
+  <span class="key">unit_of_measurement</span>: <span class="string"><span class="delimiter">"</span><span class="content">ºC</span><span class="delimiter">"</span></span>
+
+<span class="key">sensor 2</span>:
+  <span class="key">platform</span>: <span class="string"><span class="content">mqtt</span></span>
+  <span class="key">name</span>: <span class="string"><span class="delimiter">"</span><span class="content">Humidity</span><span class="delimiter">"</span></span>
+  <span class="key">state_topic</span>: <span class="string"><span class="delimiter">"</span><span class="content">sensor/humidity</span><span class="delimiter">"</span></span>
+  <span class="key">qos</span>: <span class="string"><span class="content">0</span></span>
+  <span class="key">unit_of_measurement</span>: <span class="string"><span class="delimiter">"</span><span class="content">%</span><span class="delimiter">"</span></span>
+</pre></td>
+</tr></tbody></table>
+</div>
+</article>
+<section id="disqus">
+<h3 class="indent title">Comments</h3>
+<div id="disqus_thread" aria-live="polite"><iframe id="dsq-app2" name="dsq-app2" allowtransparency="true" frameborder="0" scrolling="no" tabindex="0" title="Disqus" width="100%" src="./Report the temperature with ESP8266 to MQTT - Home Assistant_files/saved_resource.html" style="width: 1px !important; min-width: 100% !important; border: none !important; overflow: hidden !important; height: 1988px !important;" horizontalscrolling="no" verticalscrolling="no"></iframe></div>
+</section>
+</div>
+<aside id="sidebar" class="grid__item one-third lap-one-whole palm-one-whole">
+<div class="grid">
+<section class="aside-module grid__item one-whole lap-one-half">
+<h1 class="title delta">About Home Assistant</h1>
+<ul class="divided">
+<li>
+Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control.
+</li>
+<li><a href="https://home-assistant.io/getting-started/">Get started with Home Assistant</a></li>
+<li><a href="https://home-assistant.io/demo/">Try the online demo</a></li>
+<li><iframe id="twitter-widget-0" scrolling="no" frameborder="0" allowtransparency="true" class="twitter-follow-button twitter-follow-button-rendered" title="Twitter Follow Button" src="./Report the temperature with ESP8266 to MQTT - Home Assistant_files/follow_button.6e778523ecf0a9c9f1c446083d86ede1.en.html" style="position: static; visibility: visible; width: 237px; height: 20px;" data-screen-name="Home_Assistant"></iframe></li>
+</ul>
+</section>
+<script src="./Report the temperature with ESP8266 to MQTT - Home Assistant_files/ga.js"></script><script src="./Report the temperature with ESP8266 to MQTT - Home Assistant_files/cb=gapi.loaded_1" async=""></script><script src="./Report the temperature with ESP8266 to MQTT - Home Assistant_files/cb=gapi.loaded_0" async=""></script><script id="facebook-jssdk" async="" src="./Report the temperature with ESP8266 to MQTT - Home Assistant_files/sdk.js"></script><script id="twitter-wjs" async="" src="./Report the temperature with ESP8266 to MQTT - Home Assistant_files/widgets.js"></script><script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.async=true;js.src='//platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+<section class="sharing aside-module grid__item one-whole lap-one-half">
+<h1 class="title delta">Share this post</h1>
+<iframe id="twitter-widget-1" scrolling="no" frameborder="0" allowtransparency="true" class="twitter-share-button twitter-share-button-rendered twitter-tweet-button" title="Twitter Tweet Button" src="./Report the temperature with ESP8266 to MQTT - Home Assistant_files/tweet_button.6e778523ecf0a9c9f1c446083d86ede1.en.html" style="position: static; visibility: visible; width: 60px; height: 20px;" data-url="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/"></iframe>
+<div class="fb-share-button fb_iframe_widget" style="top: -6px;" data-href="https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/" data-layout="button_count" fb-xfbml-state="rendered" fb-iframe-plugin-query="app_id=338291289691179&amp;container_width=334&amp;href=https%3A%2F%2Fhome-assistant.io%2Fblog%2F2015%2F10%2F11%2Fmeasure-temperature-with-esp8266-and-report-to-mqtt%2F&amp;layout=button_count&amp;locale=en_US&amp;sdk=joey"><span style="vertical-align: bottom; width: 86px; height: 20px;"><iframe name="f3f89e7c26e4c08" width="1000px" height="1000px" frameborder="0" allowtransparency="true" allowfullscreen="true" scrolling="no" title="fb:share_button Facebook Social Plugin" src="./Report the temperature with ESP8266 to MQTT - Home Assistant_files/share_button.html" style="border: none; visibility: visible; width: 86px; height: 20px;" class=""></iframe></span></div>
+<div id="___plusone_0" style="text-indent: 0px; margin: 0px; padding: 0px; border-style: none; float: none; line-height: normal; font-size: 1px; vertical-align: baseline; display: inline-block; width: 106px; height: 24px; background: transparent;"><iframe frameborder="0" hspace="0" marginheight="0" marginwidth="0" scrolling="no" style="position: static; top: 0px; width: 106px; margin: 0px; border-style: none; left: 0px; visibility: visible; height: 24px;" tabindex="0" vspace="0" width="100%" id="I0_1465583240125" name="I0_1465583240125" src="./Report the temperature with ESP8266 to MQTT - Home Assistant_files/fastbutton.html" data-gapiattached="true" title="+1"></iframe></div>
+</section>
+<script src="./Report the temperature with ESP8266 to MQTT - Home Assistant_files/platform.js" async="" defer="" gapi_processed="true"></script>
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({appId: '338291289691179', xfbml: true, version: 'v2.2'});
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id; js.async = true;
+     js.src = "//connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>
+<section id="recent-posts" class="aside-module grid__item one-whole lap-one-half">
+<h1 class="title delta">Recent Posts</h1>
+<ul class="divided">
+<li class="post">
+<a href="https://home-assistant.io/blog/2016/06/08/super-fast-web-enocean-lirc/">0.21: Improved Web and support for EnOcean, LIRC and Osram Lightify</a>
+</li>
+<li class="post">
+<a href="https://home-assistant.io/blog/2016/06/01/community-highlights/">Community Highlights</a>
+</li>
+<li class="post">
+<a href="https://home-assistant.io/blog/2016/05/26/ibeacons-how-to-track-things-that-cant-track-themselves-part-ii/">iBeacons: How to track things that can’t track themselves (part II)</a>
+</li>
+<li class="post">
+<a href="https://home-assistant.io/blog/2016/05/22/get-started-with-all-in-one-installer/">Raspberry Pi all-in-one installer</a>
+</li>
+<li class="post">
+<a href="https://home-assistant.io/blog/2016/05/21/release-020/">0.20: Roku, Last.fm, AWS, Twilio</a>
+</li>
+</ul>
+</section>
+</div>
+</aside>
+</div>
+</div>
+<footer>
+<div class="grid-wrapper">
+<div class="grid">
+<div class="grid__item">
+<div class="copyright">
+<a rel="me" href="https://twitter.com/home_assistant"><i class="icon-twitter"></i></a>
+<a rel="me" href="https://github.com/home-assistant/home-assistant"><i class="icon-github"></i></a>
+<div class="credit">
+Contact us at <a href="mailto:hello@home-assistant.io">hello@home-assistant.io</a>.<br>
+Website powered by <a href="http://jekyllrb.com/">Jekyll</a> and the <a href="https://github.com/coogie/oscailte">Oscalite theme</a>.<br>
+Hosted by <a href="https://pages.github.com/">GitHub</a> and served by <a href="https://cloudflare.com/">CloudFlare</a>.
+</div>
+</div>
+</div>
+</div>
+</div>
+</footer>
+<script>
+  var _gaq=[['_setAccount','UA-57927901-1'],['_trackPageview']];
+  (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+  g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+  s.parentNode.insertBefore(g,s)}(document,'script'));
+</script>
+<script>
+  var disqus_shortname = 'home-assistant';
+  
+    
+    // var disqus_developer = 1;
+    var disqus_identifier = 'https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/';
+    var disqus_url = 'https://home-assistant.io/blog/2015/10/11/measure-temperature-with-esp8266-and-report-to-mqtt/';
+    var disqus_script = 'embed.js';
+  
+  (function () {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  }());
+</script>
+<script type="text/javascript">/* <![CDATA[ */(function(d,s,a,i,j,r,l,m,t){try{l=d.getElementsByTagName('a');t=d.createElement('textarea');for(i=0;l.length-i;i++){try{a=l[i].href;s=a.indexOf('/cdn-cgi/l/email-protection');m=a.length;if(a&&s>-1&&m>28){j=28+s;s='';if(j<m){r='0x'+a.substr(j,2)|0;for(j+=2;j<m&&a.charAt(j)!='X';j+=2)s+='%'+('0'+('0x'+a.substr(j,2)^r).toString(16)).slice(-2);j++;s=decodeURIComponent(s)+a.substr(j,m-j)}t.innerHTML=s.replace(/</g,'&lt;').replace(/>/g,'&gt;');l[i].href='mailto:'+t.value}}catch(e){}}}catch(e){}})(document);/* ]]> */</script>
+<div id="fb-root" class=" fb_reset"><div style="position: absolute; top: -10000px; height: 0px; width: 0px;"><div></div></div><div style="position: absolute; top: -10000px; height: 0px; width: 0px;"><div><iframe name="fb_xdm_frame_https" frameborder="0" allowtransparency="true" allowfullscreen="true" scrolling="no" id="fb_xdm_frame_https" aria-hidden="true" title="Facebook Cross Domain Communication Frame" tabindex="-1" src="./Report the temperature with ESP8266 to MQTT - Home Assistant_files/xd_arbiter.html" style="border: none;"></iframe></div></div></div><iframe name="oauth2relay440882247" id="oauth2relay440882247" src="./Report the temperature with ESP8266 to MQTT - Home Assistant_files/postmessageRelay.html" tabindex="-1" style="width: 1px; height: 1px; position: absolute; top: -100px;"></iframe><iframe id="rufous-sandbox" scrolling="no" frameborder="0" allowtransparency="true" allowfullscreen="true" style="position: absolute; visibility: hidden; display: none; width: 0px; height: 0px; padding: 0px; border: none;" src="./Report the temperature with ESP8266 to MQTT - Home Assistant_files/saved_resource(1).html"></iframe></body></html>

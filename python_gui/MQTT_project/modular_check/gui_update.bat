@@ -1,0 +1,1 @@
+pyuic4 -x Main_gui.ui -o gui1.py
